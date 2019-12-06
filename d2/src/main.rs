@@ -1,11 +1,11 @@
 use std::fs;
 
-fn add(mut dat: *Vec<i32>, src1: usize, src2: usize, dest: usize) {
-    dat[dest] = dat[src1] + dat[src2];
+fn add(dat: &mut [i32], pc: &usize) {
+    dat[*pc + 3] = dat[*pc + 1] + dat[*pc + 2];
 }
 
-fn mul(mut dat: *Vec<i32>, src1: usize, src2: usize, dest: usize) {
-    dat[dest] = dat[src1] * dat[src2];
+fn mul(dat: &mut [i32], pc: &usize) {
+    dat[*pc + 3] = dat[*pc + 1] * dat[*pc + 2];
 }
 
 fn main() {
@@ -24,11 +24,11 @@ fn main() {
     while pc < dat.len() {
         match dat[pc] {
             1 => { 
-                add(&dat, dat[pc+1] as usize, dat[pc+2] as usize, dat[pc+3] as usize); 
+                add(dat.as_mut_slice(), &pc); 
                 pc = pc + 4;
             }
             2 => { 
-                mul(&dat, dat[pc+1] as usize, dat[pc+2] as usize, dat[pc+3] as usize); 
+                mul(dat.as_mut_slice(), &pc); 
                 pc = pc + 4;
             }
             _ => {
