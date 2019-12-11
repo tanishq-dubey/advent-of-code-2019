@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use std::cmp;
 
 #[derive(Debug, Copy, Clone)]
 struct Segment {
@@ -39,6 +40,22 @@ fn skip_string_num(s: &str, skip: usize) -> i32 {
         }
     };
     return num;
+}
+
+fn on_wire_distance(w: Vec<Segment>, target: Point) -> i32 {
+    let mut dist: i32 = 0;
+    for s in w {
+        // check if point is on segment
+        let cross: i32 = (target.y - s.start.y) * (s.end.x - s.start.x) - (target.x - s.start.x) * (s.end.y - s.start.y);
+        if cross.abs() == 0 && (cmp::min(s.start.x, s.end.x) <= target.x && target.x <= cmp::max(s.start.x, s.end.x)) && (cmp::min(s.start.y, s.end.y) <= target.y && target.y <= cmp::max(s.start.y, s.end.y)) {
+            println!("point {:?} is on {:?}", target, s);
+            dist = dist + ((target.x  - s.start.x).abs() + (target.y - s.start.y).abs());
+            return dist;
+        } else {
+            dist = dist + ((s.end.x  - s.start.x).abs() + (s.end.y - s.start.y).abs());
+        }
+    }
+    return 1000000000;
 }
 
 fn main() {
@@ -99,6 +116,8 @@ fn main() {
         }
         wires.push(wire);
     }
+
+    // Part 1
     let mut dist: i32 = 100000000;
     let wire_1 = &(wires[0]);
     let wire_2 = &(wires[1]);
@@ -114,5 +133,25 @@ fn main() {
             }
         }
     }
-    println!("{}", dist)
+    println!("{}", dist);
+
+
+    println!("\n\npt2");
+
+    // Part 2
+    dist = 1000000000;
+    for i in wire_1 {
+        for j in wire_2 {
+            let (p, is_intersect) = do_intersection(i.start, i.end, j.start, j.end);
+            if is_intersect {
+                println!("intersect @ {:?}", p);
+                let c_dist = on_wire_distance(wire_1.to_vec(), p) + on_wire_distance(wire_2.to_vec(), p);
+                if c_dist < dist {
+                    println!("hit: {:?}", p);
+                    dist = c_dist;
+                }
+            }
+        }
+    }
+    println!("{}", dist);
 }
