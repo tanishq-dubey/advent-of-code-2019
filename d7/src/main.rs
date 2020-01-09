@@ -73,15 +73,15 @@ impl Computer {
         if self.pc + 3 > self.memory.len() {
             panic!("On ADD opcode, but not enough data left to add");
         }
-        let mut arg1:i32 = self.memory[self.pc + 1];
-        if self.memory[self.pc]/100%10 == 0 {
+        let mut arg1: i32 = self.memory[self.pc + 1];
+        if self.memory[self.pc] / 100 % 10 == 0 {
             arg1 = self.memory[self.memory[self.pc + 1] as usize];
         }
-        let mut arg2:i32 = self.memory[self.pc + 2];
-        if self.memory[self.pc]/1000%10 == 0 {
+        let mut arg2: i32 = self.memory[self.pc + 2];
+        if self.memory[self.pc] / 1000 % 10 == 0 {
             arg2 = self.memory[self.memory[self.pc + 2] as usize];
         }
-        let arg3:i32 = self.memory[self.pc + 3];
+        let arg3: i32 = self.memory[self.pc + 3];
 
         self.memory[arg3 as usize] = arg1 + arg2;
 
@@ -93,15 +93,15 @@ impl Computer {
         if self.pc + 3 > self.memory.len() {
             panic!("On MUL opcode, but not enough data left to add");
         }
-        let mut arg1:i32 = self.memory[self.pc + 1];
-        if self.memory[self.pc]/100%10 == 0 {
+        let mut arg1: i32 = self.memory[self.pc + 1];
+        if self.memory[self.pc] / 100 % 10 == 0 {
             arg1 = self.memory[self.memory[self.pc + 1] as usize];
         }
-        let mut arg2:i32 = self.memory[self.pc + 2];
-        if self.memory[self.pc]/1000%10 == 0 {
+        let mut arg2: i32 = self.memory[self.pc + 2];
+        if self.memory[self.pc] / 1000 % 10 == 0 {
             arg2 = self.memory[self.memory[self.pc + 2] as usize];
         }
-        let arg3:i32 = self.memory[self.pc + 3];
+        let arg3: i32 = self.memory[self.pc + 3];
 
         self.memory[arg3 as usize] = arg1 * arg2;
 
@@ -137,8 +137,8 @@ impl Computer {
             panic!("On PUTS opcode, but not enough data left to get put data");
         }
 
-        let mut arg1:i32 = self.memory[self.pc + 1];
-        if self.memory[self.pc]/100%10 == 0 {
+        let mut arg1: i32 = self.memory[self.pc + 1];
+        if self.memory[self.pc] / 100 % 10 == 0 {
             arg1 = self.memory[self.memory[self.pc + 1] as usize];
         }
 
@@ -152,12 +152,12 @@ impl Computer {
         if self.pc + 2 > self.memory.len() {
             panic!("On JNZ opcode, but not enough data left to get put data");
         }
-        let mut arg1:i32 = self.memory[self.pc + 1];
-        if self.memory[self.pc]/100%10 == 0 {
+        let mut arg1: i32 = self.memory[self.pc + 1];
+        if self.memory[self.pc] / 100 % 10 == 0 {
             arg1 = self.memory[self.memory[self.pc + 1] as usize];
         }
-        let mut arg2:i32 = self.memory[self.pc + 2];
-        if self.memory[self.pc]/1000%10 == 0 {
+        let mut arg2: i32 = self.memory[self.pc + 2];
+        if self.memory[self.pc] / 1000 % 10 == 0 {
             arg2 = self.memory[self.memory[self.pc + 2] as usize];
         }
         if arg1 != 0 {
@@ -172,12 +172,12 @@ impl Computer {
         if self.pc + 2 > self.memory.len() {
             panic!("On JZ opcode, but not enough data left to get put data");
         }
-        let mut arg1:i32 = self.memory[self.pc + 1];
-        if self.memory[self.pc]/100%10 == 0 {
+        let mut arg1: i32 = self.memory[self.pc + 1];
+        if self.memory[self.pc] / 100 % 10 == 0 {
             arg1 = self.memory[self.memory[self.pc + 1] as usize];
         }
-        let mut arg2:i32 = self.memory[self.pc + 2];
-        if self.memory[self.pc]/1000%10 == 0 {
+        let mut arg2: i32 = self.memory[self.pc + 2];
+        if self.memory[self.pc] / 1000 % 10 == 0 {
             arg2 = self.memory[self.memory[self.pc + 2] as usize];
         }
         if arg1 == 0 {
@@ -192,15 +192,15 @@ impl Computer {
         if self.pc + 2 > self.memory.len() {
             panic!("On LT opcode, but not enough data left to get put data");
         }
-        let mut arg1:i32 = self.memory[self.pc + 1];
-        if self.memory[self.pc]/100%10 == 0 {
+        let mut arg1: i32 = self.memory[self.pc + 1];
+        if self.memory[self.pc] / 100 % 10 == 0 {
             arg1 = self.memory[self.memory[self.pc + 1] as usize];
         }
-        let mut arg2:i32 = self.memory[self.pc + 2];
-        if self.memory[self.pc]/1000%10 == 0 {
+        let mut arg2: i32 = self.memory[self.pc + 2];
+        if self.memory[self.pc] / 1000 % 10 == 0 {
             arg2 = self.memory[self.memory[self.pc + 2] as usize];
         }
-        let arg3:i32 = self.memory[self.pc + 3];
+        let arg3: i32 = self.memory[self.pc + 3];
 
         if arg1 < arg2 {
             self.memory[arg3 as usize] = 1;
@@ -215,15 +215,15 @@ impl Computer {
         if self.pc + 2 > self.memory.len() {
             panic!("On EQ opcode, but not enough data left to get put data");
         }
-        let mut arg1:i32 = self.memory[self.pc + 1];
-        if self.memory[self.pc]/100%10 == 0 {
+        let mut arg1: i32 = self.memory[self.pc + 1];
+        if self.memory[self.pc] / 100 % 10 == 0 {
             arg1 = self.memory[self.memory[self.pc + 1] as usize];
         }
-        let mut arg2:i32 = self.memory[self.pc + 2];
-        if self.memory[self.pc]/1000%10 == 0 {
+        let mut arg2: i32 = self.memory[self.pc + 2];
+        if self.memory[self.pc] / 1000 % 10 == 0 {
             arg2 = self.memory[self.memory[self.pc + 2] as usize];
         }
-        let arg3:i32 = self.memory[self.pc + 3];
+        let arg3: i32 = self.memory[self.pc + 3];
 
         if arg1 == arg2 {
             self.memory[arg3 as usize] = 1;
@@ -264,16 +264,21 @@ impl Computer {
                 self.pc = self.pc;
                 self.eom = true;
             }
-            _ => {
-                panic!("Unknown opcode {:#?}\n\n{:?}", self.memory[self.pc], self.memory)
-            }
+            _ => panic!(
+                "Unknown opcode {:#?}\n\n{:?}",
+                self.memory[self.pc], self.memory
+            ),
         }
     }
 }
 
 // Taken from https://rosettacode.org/wiki/Permutations#Rust
 pub fn permutations(size: usize) -> Permutations {
-    Permutations { idxs: (0..size).collect(), swaps: vec![0; size], i: 0 }
+    Permutations {
+        idxs: (0..size).collect(),
+        swaps: vec![0; size],
+        i: 0,
+    }
 }
 
 pub struct Permutations {
@@ -288,8 +293,12 @@ impl Iterator for Permutations {
     fn next(&mut self) -> Option<Self::Item> {
         if self.i > 0 {
             loop {
-                if self.i >= self.swaps.len() { return None; }
-                if self.swaps[self.i] < self.i { break; }
+                if self.i >= self.swaps.len() {
+                    return None;
+                }
+                if self.swaps[self.i] < self.i {
+                    break;
+                }
                 self.swaps[self.i] = 0;
                 self.i += 1;
             }
@@ -308,7 +317,6 @@ fn pause() {
     stdin().read(&mut [0]).unwrap();
 }
 
-
 fn main() {
     let perms = permutations(5).collect::<Vec<_>>();
 
@@ -322,7 +330,7 @@ fn main() {
     let mut amp_e = Computer::new();
 
     let mut max = 0;
-    let mut max_p:Vec<usize> = vec![];
+    let mut max_p: Vec<usize> = vec![];
 
     for p in perms {
         // Reset all amplifiers
