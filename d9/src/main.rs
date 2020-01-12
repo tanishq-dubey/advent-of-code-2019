@@ -74,50 +74,105 @@ impl Computer {
         }
     }
 
-    fn get_arg_one(&mut self) -> i64 {
-        let mut arg1: i64 = self.memory[self.pc + 1];
+    /*
+     * Param mode 0 - Positions mode
+     *  example: 000 01 5 6 7
+     *  MUL [5] + [6] -> [7]
+     * Param mode 1 - Immediate mode
+     *  example: 010 01 5 6 7
+     *  MUL [5] + 6 -> [7]
+     *  write params will never be immediate
+     * Param mode 2 - Relative mode
+     *  example: 220 01 5 6 7
+     *  MUL [5] + (BASER + [6]) -> (BASER + [7])
+     */
+    fn first_arg_addr(&mut self) -> usize {
+        let mut retval: usize = (self.memory[self.pc + 1]) as usize;
+        println!("one: {} {}", retval, self.memory[self.pc]);
         if self.memory[self.pc] / 100 % 10 == 0 {
-            if self.memory[self.pc + 1] as usize > self.memory.len() {
-                println!("GROW: {}", self.memory[self.pc + 1] as usize - self.memory.len());
-                for _ in 0..(self.memory[self.pc + 1] as usize - self.memory.len()) + 1 {
+            println!("\tone");
+            if retval  > self.memory.len() {
+                for _ in 0..(retval - self.memory.len()) + 1 {
                     self.memory.push(0);
                 }
             }
-            arg1 = self.memory[self.memory[self.pc + 1] as usize];
+            return retval;
+        } else if self.memory[self.pc] / 100 % 10 == 1 {
+            println!("\tone");
+            return self.pc + 1
         } else if self.memory[self.pc] / 100 % 10 == 2 {
-            let val: i64 = self.base_reg as i64 + arg1;
-            if val as usize > self.memory.len() {
-                println!("GPOW: {}", val as usize - self.memory.len());
-                for _ in 0..(val as usize - self.memory.len()) + 1 {
+            let temp_retval: i64 = self.memory[self.pc + 1] + self.base_reg as i64;
+            println!("\t\ttwo {} {} {}", temp_retval, self.memory[self.pc + 1], self.base_reg);
+            if temp_retval < 0 {
+                retval = 0;
+            } else {
+                retval = temp_retval as usize;
+            }
+            if retval  > self.memory.len() {
+                for _ in 0..(retval - self.memory.len()) + 1 {
                     self.memory.push(0);
                 }
             }
-            arg1 = self.memory[val as usize];
+            return retval;
         }
-        return arg1;
+        println!("SOME HOWE HERE??");
+        return retval;
     }
 
-    fn get_arg_two(&mut self) -> i64 {
-        let mut arg1: i64 = self.memory[self.pc + 2];
+    fn second_arg_addr(&mut self) -> usize {
+        let mut retval: usize = (self.memory[self.pc + 2]) as usize;
         if self.memory[self.pc] / 1000 % 10 == 0 {
-            if self.memory[self.pc + 2] as usize > self.memory.len() {
-                println!("GROW2: {}", self.memory[self.pc + 1] as usize - self.memory.len());
-                for _ in 0..(self.memory[self.pc + 2] as usize - self.memory.len()) + 1 {
+            if retval  > self.memory.len() {
+                for _ in 0..(retval - self.memory.len()) + 1 {
                     self.memory.push(0);
                 }
             }
-            arg1 = self.memory[self.memory[self.pc + 2] as usize];
+            return retval;
+        } else if self.memory[self.pc] / 1000 % 10 == 1 {
+            return self.pc + 2
         } else if self.memory[self.pc] / 1000 % 10 == 2 {
-            let val: i64 = self.base_reg as i64 + arg1;
-            if val as usize > self.memory.len() {
-                println!("GPOW2: {}", val as usize - self.memory.len());
-                for _ in 0..(val as usize - self.memory.len()) + 1 {
+            let temp_retval: i64 = self.memory[self.pc + 2] + self.base_reg as i64;
+            if temp_retval < 0 {
+                retval = 0;
+            } else {
+                retval = temp_retval as usize;
+            }
+            if retval  > self.memory.len() {
+                for _ in 0..(retval - self.memory.len()) + 1 {
                     self.memory.push(0);
                 }
             }
-            arg1 = self.memory[val as usize];
+            return retval;
         }
-        return arg1;
+        return retval;
+    }
+
+    fn third_arg_addr(&mut self) -> usize {
+        let mut retval: usize = (self.memory[self.pc + 3]) as usize;
+        if self.memory[self.pc] / 10000 % 10 == 0 {
+            if retval + 1 > self.memory.len() {
+                for _ in 0..(retval - self.memory.len()) + 1 {
+                    self.memory.push(0);
+                }
+            }
+            return retval;
+        } else if self.memory[self.pc] / 10000 % 10 == 1 {
+            panic!("Value for {} has a immediate write val", self.pc);
+        } else if self.memory[self.pc] / 10000 % 10 == 2 {
+            let temp_retval: i64 = self.memory[self.pc + 3] + self.base_reg as i64;
+            if temp_retval < 0 {
+                retval = 0;
+            } else {
+                retval = temp_retval as usize;
+            }
+            if retval + 1 > self.memory.len() {
+                for _ in 0..(retval - self.memory.len()) + 1 {
+                    self.memory.push(0);
+                }
+            }
+            return retval;
+        }
+        return retval;
     }
 
     fn add(&mut self) {
@@ -127,40 +182,30 @@ impl Computer {
         if self.pc + 3 > self.memory.len() {
             panic!("On ADD opcode, but not enough data left to add");
         }
-        let arg1 = self.get_arg_one();
-        let arg2 = self.get_arg_two();
 
-        let arg3: i64 = self.memory[self.pc + 3];
-        if arg3 as usize > self.memory.len() - 1 {
-            for _ in 0..(arg3 as usize - self.memory.len()) + 1 {
-                self.memory.push(0);
-            }
-        }
+        let addr1 = self.first_arg_addr();
+        let addr2 = self.second_arg_addr();
+        let addr3 = self.third_arg_addr();
 
-        self.memory[arg3 as usize] = arg1 + arg2;
+        self.memory[addr3] = self.memory[addr1] + self.memory[addr2];
 
         self.pc = self.pc + 4;
     }
 
     fn mul(&mut self) {
         if self.debug {
-            println!("{:?}: MUL", self.pc);
+            println!("{:?}: MUL ({})", self.pc, self.memory[self.pc]);
         }
         if self.pc + 3 > self.memory.len() {
             panic!("On MUL opcode, but not enough data left to add");
         }
-        let arg1 = self.get_arg_one();
-        let arg2 = self.get_arg_two();
 
-        let arg3: i64 = self.memory[self.pc + 3];
-        if arg3 as usize > self.memory.len() - 1 {
-            for _ in 0..(arg3 as usize - self.memory.len()) + 1 {
-                self.memory.push(0);
-            }
-        }
+        let addr1 = self.first_arg_addr();
+        let addr2 = self.second_arg_addr();
+        let addr3 = self.third_arg_addr();
+        println!("{} {} {}", addr1, addr2, addr3);
 
-        self.memory[arg3 as usize] = arg1 * arg2;
-        println!("\t{:?} * {:?} = [{:?}],{:?}", arg1, arg2, arg3, self.memory[arg3 as usize]);
+        self.memory[addr3] = self.memory[addr1] * self.memory[addr2];
 
         self.pc = self.pc + 4;
     }
@@ -176,13 +221,11 @@ impl Computer {
         match self.in_reg {
             Some(v) => {
                 // Get Value
-                let arg1 = self.get_arg_one();
-                let m:usize = self.memory[self.pc + 1] as usize;
-                self.memory[self.base_reg + m] = v;
+                let addr1 = self.first_arg_addr();
+                self.memory[addr1] = v;
 
                 // Clear register
                 self.in_reg = None;
-                println!("\t{}, [{:?}], {}", v, self.base_reg + m, self.memory[arg1 as usize]);
                 self.pc = self.pc + 2;
             }
             None => {
@@ -199,33 +242,34 @@ impl Computer {
             panic!("On PUTS opcode, but not enough data left to get put data");
         }
 
-        let arg1 = self.get_arg_one();
+        let addr1 = self.first_arg_addr();
 
         if self.debug {
-            println!("The value at {:?} -> {:?}", self.pc + 1, arg1);
+            println!("The value at {:?} -> {:?}", self.pc + 1, self.memory[addr1]);
         }
-        println!("{}", arg1);
-        self.out_reg = Some(arg1);
+        self.out_reg = Some(self.memory[addr1]);
         self.pc = self.pc + 2;
     }
 
     fn jnz(&mut self) {
         if self.debug {
-            println!("{:?}: JNZ", self.pc);
+            println!("{:?}: JNZ ({})", self.pc, self.memory[self.pc]);
         }
         if self.pc + 2 > self.memory.len() {
             panic!("On JNZ opcode, but not enough data left to get put data");
         }
 
-        let arg1 = self.get_arg_one();
-        let arg2 = self.get_arg_two();
+        let addr1 = self.first_arg_addr();
+        let addr2 = self.second_arg_addr();
 
-        if arg1 != 0 {
-            self.pc = arg2 as usize;
-            println!("\t{:?} != 0, {:?}, PC: {:?}", arg1, arg2, self.pc);
+        println!("\t{} {}", addr1, addr2);
+
+        if self.memory[addr1] != 0 {
+            self.pc = self.memory[addr2] as usize;
+            println!("\t{:?} != 0, {:?}, PC: {:?}", self.memory[addr1], self.memory[addr2], self.pc);
             return;
         }
-        println!("\t{:?} == 0, {:?}, PC: {:?}", arg1, arg2, self.pc);
+
         self.pc = self.pc + 3;
     }
 
@@ -237,16 +281,17 @@ impl Computer {
             panic!("On JZ opcode, but not enough data left to get put data");
         }
 
-        let arg1 = self.get_arg_one();
-        let arg2 = self.get_arg_two();
+        let addr1 = self.first_arg_addr();
+        let addr2 = self.second_arg_addr();
+        println!("{} {}", addr1, addr2);
+        println!("{} {} -- {} {}", addr1, addr2, self.memory[addr1], self.memory[addr2]);
 
-        if arg1 == 0 {
-            self.pc = arg2 as usize;
-            println!("\t{:?} == 0, {:?}, PC: {:?}", arg1, arg2, self.pc);
+        if self.memory[addr1] == 0 {
+            self.pc = self.memory[addr2] as usize;
+            println!("\t{:?} == 0, {:?}, PC: {:?}", self.memory[addr1], self.memory[addr2], self.pc);
             return;
         }
 
-        println!("\t{:?} != 0, {:?}, PC: {:?}", arg1, arg2, self.pc);
         self.pc = self.pc + 3;
     }
 
@@ -258,23 +303,15 @@ impl Computer {
             panic!("On LT opcode, but not enough data left to get put data");
         }
 
-        let arg1 = self.get_arg_one();
-        let arg2 = self.get_arg_two();
+        let addr1 = self.first_arg_addr();
+        let addr2 = self.second_arg_addr();
+        let addr3 = self.third_arg_addr();
 
-        let arg3: i64 = self.memory[self.pc + 3];
-        if arg3 as usize > self.memory.len() - 1 {
-            for _ in 0..(arg3 as usize - self.memory.len()) + 1 {
-                self.memory.push(0);
-            }
-        }
-
-        if arg1 < arg2 {
-            self.memory[arg3 as usize] = 1;
+        if self.memory[addr1] < self.memory[addr2] {
+            self.memory[addr3] = 1;
         } else {
-            self.memory[arg3 as usize] = 0;
+            self.memory[addr3] = 0;
         }
-
-        println!("\t{:?} < {:?} = [{:?}],{:?}", arg1, arg2, arg3, self.memory[arg3 as usize]);
 
         self.pc = self.pc + 4;
     }
@@ -287,21 +324,16 @@ impl Computer {
             panic!("On EQ opcode, but not enough data left to get put data");
         }
 
-        let arg1 = self.get_arg_one();
-        let arg2 = self.get_arg_two();
+        let addr1 = self.first_arg_addr();
+        let addr2 = self.second_arg_addr();
+        let addr3 = self.third_arg_addr();
 
-        let arg3: i64 = self.memory[self.pc + 3];
-        if arg3 as usize > self.memory.len() - 1 {
-            for _ in 0..(arg3 as usize - self.memory.len()) + 1 {
-                self.memory.push(0);
-            }
-        }
-
-        if arg1 == arg2 {
-            self.memory[arg3 as usize] = 1;
+        if self.memory[addr1] == self.memory[addr2] {
+            self.memory[addr3] = 1;
         } else {
-            self.memory[arg3 as usize] = 0;
+            self.memory[addr3] = 0;
         }
+
         self.pc = self.pc + 4;
     }
 
@@ -313,15 +345,15 @@ impl Computer {
             panic!("On BASE opcode, but not enough data left to get data");
         }
 
-        let arg1 = self.get_arg_one();
+        let addr1 = self.first_arg_addr();
+        let bval = self.base_reg as i64 + self.memory[addr1];
 
-        let bval = self.base_reg as i64 + arg1;
         if bval < 0 {
             self.base_reg = 0;
         } else {
             self.base_reg = bval as usize;
         }
-        println!("\t{:?}, Base: {:?}", arg1, self.base_reg);
+
         self.pc = self.pc + 2;
     }
 
@@ -386,7 +418,7 @@ fn main() {
     let mut comp = Computer::new();
     comp.reset(prog);
     comp.debug = true;
-    comp.ext_write(Some(1));
+    comp.ext_write(Some(2));
 
     while !comp.eom {
         comp.tick();
